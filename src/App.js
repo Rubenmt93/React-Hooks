@@ -1,51 +1,33 @@
-import {useState, useEffect, Component} from 'react'
-const useContador = (inicial) => {
-    const [contador, setContador] = useState(inicial)
-    const incrementar =() => {
-      setContador(contador+1)
-    }
-    return [contador, incrementar]
-}
-// const Interval= ({contador}) => {
-//   useEffect(()=>{
-//     const i = setInterval(()=>console.log(contador),1000)
-//     return () =>clearInterval(i)  
-//   },[contador])
-//   return (
-//     <p> Intervalo</p>
-//   )
-// }
-class Interval extends Component {
+import {useReducer, useState} from 'react'
+const inicial = {contador:0}
+// {contador : 0}
+const reducer = (state,action) => {
+  switch(action.type){
+    case 'incrementar':
+      return {contador: state.contador + 1}
+    case 'decrementar':
+      return {contador: state.contador - 1}
+    case 'set':
+      return {contador: action.payload}
+    default :
+      return state
   
-  intervalo=''
-  componentDidMount() {
-   this.intervalo = setInterval(()=>console.log(this.props.contador),1000)
   }
-  componentWillUnmount() {
-    clearInterval( this.intervalo)
-  }
+}
+
+const App = () => {
+ const [state, dispatch]= useReducer(reducer, inicial)
+ const [valor, setValor]= useState(0)
+
+ return(
+  <div>
+    Contador: {state.contador}
+    <input value ={valor} onChange={e => setValor(e.target.value)}/>
+    <button onClick={() => dispatch({type: 'incrementar'})}>Más</button>
   
-  render(){
-    return (
-      <p>Intervalo</p>
-    )
-  }
-
+    <button onClick={() => dispatch({type: 'decrementar'})}>Menos</button> 
+    <button onClick={() => dispatch({type: 'set', payload: Number(valor)})}>Set</button> 
+  </div>
+ )
 }
-const App= () => {
-
-  const[contador, incrementar] = useContador(0)
-  useEffect(()=>{ 
-      document.title=contador
-      console.log('bu')
-    },
-    [contador])
-  return (
-    <div>
-          Contador: {contador}
-          <button onClick= {incrementar}> Incementar</button>
-          <Interval contador= {contador}></Interval>
-    </div>
-  )
-}
-export default App;
+export default App
